@@ -71,3 +71,12 @@ python -m pytest
 ### License
 
 MIT
+
+## My Changes in This Fork
+
+This fork is for learning. The original project is [micrograd](https://github.com/karpathy/micrograd) by **Andrej Karpathy** (MIT License) — a tiny autograd engine and neural-net library with a PyTorch-like API. All credit for the original code goes to him. My change is one small, real addition so I could understand autograd properly:
+
+- **Added a `tanh()` activation function** to the `Value` class in `micrograd/engine.py` (it previously had only `relu`). Forward pass: `tanh(x) = (e^{2x} - 1) / (e^{2x} + 1)`. Backward pass uses its derivative, `1 - tanh^2(x)`.
+- **Added `test_tanh()`** in `test/test_engine.py`, which checks `tanh()` against PyTorch on a single value and inside a larger expression, in the same style as the existing tests.
+
+What I learned from this change: how an activation function plugs into an autograd engine — every operation needs a forward rule and a backward (chain-rule) rule. tanh squashes values into (-1, 1); its gradient is biggest near 0 and close to 0 at the extremes, which is exactly where gradients can vanish during training.
