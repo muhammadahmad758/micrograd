@@ -65,3 +65,44 @@ def test_more_ops():
     # backward pass went well
     assert abs(amg.grad - apt.grad.item()) < tol
     assert abs(bmg.grad - bpt.grad.item()) < tol
+
+def test_tanh():
+
+    # tanh on a single value
+    x = Value(-2.0)
+    y = x.tanh()
+    y.backward()
+    xmg, ymg = x, y
+
+    x = torch.Tensor([-2.0]).double()
+    x.requires_grad = True
+    y = torch.tanh(x)
+    y.backward()
+    xpt, ypt = x, y
+
+    tol = 1e-6
+    # forward pass went well
+    assert abs(ymg.data - ypt.data.item()) < tol
+    # backward pass went well
+    assert abs(xmg.grad - xpt.grad.item()) < tol
+
+    # tanh inside a larger expression
+    a = Value(1.5)
+    b = Value(-0.5)
+    c = (a * b).tanh() + a.tanh()
+    c.backward()
+    amg, bmg, cmg = a, b, c
+
+    a = torch.Tensor([1.5]).double()
+    b = torch.Tensor([-0.5]).double()
+    a.requires_grad = True
+    b.requires_grad = True
+    c = torch.tanh(a * b) + torch.tanh(a)
+    c.backward()
+    apt, bpt, cpt = a, b, c
+
+    # forward pass went well
+    assert abs(cmg.data - cpt.data.item()) < tol
+    # backward pass went well
+    assert abs(amg.grad - apt.grad.item()) < tol
+    assert abs(bmg.grad - bpt.grad.item()) < tol
